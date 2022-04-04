@@ -1,6 +1,13 @@
 # Read me
 ## installation
 ### Start mongodb replicaset
+### 1 with docker
+use the docker compose to starte a local mongo server on port 27017 and an mongo express on 8081
+```sh
+$ docker-compose up
+$ docker exec mongo /scripts/rs-init.sh
+```
+### 2 without docker
 - Start mongodb as replicaset :  
 Edit /etc/mongod.conf, find the line that reads #replication: towards the bottom of the file. It will look like this:
 ```conf
