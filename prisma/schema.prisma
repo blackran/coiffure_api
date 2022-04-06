@@ -12,31 +12,43 @@ datasource db {
 }
 
 model User {
-  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   lastName  String
   firstName String?
-  email     String         @unique
+  email     String    @unique
   phone     String?
   password  String
   address   String?
   birthDate DateTime?
-  isActif   Boolean?       @default(true)
-  roleIDs   String[]       @db.ObjectId
-  roles     Role[]         @relation(fields: [roleIDs], references: [id])
+  isActif   Boolean?  @default(true)
+  roleIDs   String[]  @db.ObjectId
+  roles     Role[]    @relation(fields: [roleIDs], references: [id])
+  entityIDs String[]  @db.ObjectId
+  entities  Entity[]  @relation(fields: [entityIDs], references: [id])
 }
 
 model Role {
-  id          String               @id @default(auto()) @map("_id") @db.ObjectId
-  name        String               @unique
-  usersIDs    String[]             @db.ObjectId
-  users       User[]               @relation(fields: [usersIDs], references: [id])
-  permissionIDs String[] @db.ObjectId
-  permissions Permission[] @relation(fields: [permissionIDs], references: [id])
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String       @unique
+  usersIDs      String[]     @db.ObjectId
+  users         User[]       @relation(fields: [usersIDs], references: [id])
+  permissionIDs String[]     @db.ObjectId
+  permissions   Permission[] @relation(fields: [permissionIDs], references: [id])
 }
 
 model Permission {
-  id    String               @id @default(auto()) @map("_id") @db.ObjectId
-  name  String               @unique
-  roleIDs String[]          @db.ObjectId
-  roles Role[] @relation(fields: [roleIDs], references: [id])
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String   @unique
+  roleIDs String[] @db.ObjectId
+  roles   Role[]   @relation(fields: [roleIDs], references: [id])
+}
+
+model Entity {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  siret   String   @unique
+  phone   String?
+  email   String?
+  userIDs String[] @db.ObjectId
+  users   User[]   @relation(fields: [userIDs], references: [id])
 }

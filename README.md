@@ -39,8 +39,13 @@ https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/
 https://www.digitalocean.com/community/tutorials/how-to-configure-a-mongodb-replica-set-on-ubuntu-20-04
 
 ## Create the database
+- Step 1 : generete the database
 ```sh
 $ npx prisma db push
+```
+- Step 2 : generate prisma model to node modules
+```sh
+$ npx prisma generate
 ```
 
 # Start the app

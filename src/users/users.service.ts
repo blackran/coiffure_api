@@ -1,13 +1,16 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from '@prisma/client/runtime';
 import { RolesService } from 'src/roles/roles.service';
+import { EntityService } from 'src/entity/entity.service';
+import { CreateEntityDto } from 'src/entity/dto/create-entity.dto';
 
 @Injectable()
 export class UsersService {
-  constructor (private prismaService: PrismaService, private rolesService: RolesService) {}
+  constructor(private prismaService: PrismaService, private rolesService: RolesService, @Inject(forwardRef(() => EntityService)) private entityService: EntityService) {}
+  
   async create(createUserDto: Prisma.UserCreateInput) {
     try {
       let hasedPassword = await bcrypt.hash(createUserDto.password, await bcrypt.genSalt(10))
@@ -31,13 +34,22 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return this.prismaService.user.findMany();
+  async findAll(prismaArgs: Prisma.UserArgs = {}) {
+    try {
+      let users = await this.prismaService.user.findMany({ ...prismaArgs });
+      return users;
+    } catch (error) {
+      if (error instanceof PrismaClientValidationError) {
+        console.log(error)
+        throw new BadRequestException(`Query argument validation faild`)
+      }
+      throw error;
+    }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, prismaArgs: Prisma.UserArgs = {}) {
     try {
-      const user = await this.prismaService.user.findUnique({ where: { id } });
+      const user = await this.prismaService.user.findUnique({...prismaArgs, where: { id }});
       if (!user) {
         throw new NotFoundException(`User with id ${id} not found`);
       }
@@ -49,6 +61,10 @@ export class UsersService {
           throw new BadRequestException(`Provided hex string ${id} representation must be exactly 12 bytes`)
         }
         throw error;
+      }
+      if (error instanceof PrismaClientValidationError) {
+        console.log(error)
+        throw new BadRequestException(`Query argument validation faild`)
       }
       throw error;
     }
@@ -103,4 +119,54 @@ export class UsersService {
       }
     })
   }
+
+  async addEntity(userId: string, entityId: string) {
+    await this.findOne(userId);
+    await this.entityService.findOne(entityId);
+    return this.prismaService.user.update({where: {id: userId}, data: {
+      entities: {
+        connect: {id: entityId}
+      }
+    }});
+  }
+
+  async removeEntity(userId: string, entityId: string) {
+    await this.findOne(userId);
+    await this.entityService.findOne(entityId);
+    return this.prismaService.user.update({
+      where: { id: userId }, data: {
+        entities: {
+          disconnect: { id: entityId }
+        }
+      }
+    });
+  }
+
+  async createEntity(userId: string, createEntityDto: CreateEntityDto) {
+   try {
+     let updatedUser = await this.prismaService.user.update({
+       where: { id: userId }, data: {
+         entities: {
+           create: createEntityDto
+         }
+       }
+     });
+     return updatedUser;
+   } catch (error) {
+     // Handle contrainst error
+     if (error instanceof Prisma.PrismaClientKnownRequestError) {
+       if (error.code === 'P2016') {
+         throw new NotFoundException(`User wit id ${userId} not found`)
+       }
+       if (error.code === 'P2002') {
+         throw new ConflictException("Siret already exist");
+       } else {
+         throw error;
+       }
+     }
+     throw error;
+   }
+  }
+
+  
 }
