@@ -1,26 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { EntityService } from './entity.service';
 import { CreateEntityDto } from './dto/create-entity.dto';
 import { UpdateEntityDto } from './dto/update-entity.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { SearchQueryDto } from './dto/search-query.dto';
 
 @Controller('entity')
 @ApiTags('Etities')
-@ApiBearerAuth()
-@UseGuards(JwtGuard)
+// @ApiBearerAuth()
+// @UseGuards(JwtGuard)
 export class EntityController {
-  constructor(private readonly entityService: EntityService) {}
+  constructor(private readonly entityService: EntityService) { }
 
   @Post()
   create(@Body() createEntityDto: CreateEntityDto) {
-    return this.entityService.create(<Prisma.EntityCreateInput>createEntityDto);
+    return this.entityService.create(createEntityDto);
   }
 
   @Get()
   findAll() {
     return this.entityService.findAll();
+  }
+
+  @Get('search')
+  @ApiQuery({ name: 'longitude', required: true, type: "number"})
+  @ApiQuery({ name: 'latitude', required: true, type: "number"})
+  @ApiQuery({ name: 'distance', required: true, type: "number"})
+  search(@Query() query: SearchQueryDto) {
+    return this.entityService.search(+query.longitude, +query.latitude, +query.distance);
   }
 
   @Get(':id')
@@ -39,12 +48,12 @@ export class EntityController {
   }
 
   @Post(':entityId/users/:userId')
-  addUser(@Param('entityId') entityId: string, @Param('userId') userId: string){
+  addUser(@Param('entityId') entityId: string, @Param('userId') userId: string) {
     return this.entityService.addUser(entityId, userId);
   }
 
   @Delete(':entityId/users/:userId')
-  removeUser(@Param('entityId') entityId: string, @Param('userId') userId: string){
+  removeUser(@Param('entityId') entityId: string, @Param('userId') userId: string) {
     return this.entityService.removeUser(entityId, userId);
   }
 }

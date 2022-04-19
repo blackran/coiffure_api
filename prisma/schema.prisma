@@ -51,4 +51,16 @@ model Entity {
   email   String?
   userIDs String[] @db.ObjectId
   users   User[]   @relation(fields: [userIDs], references: [id])
+  location Location?
+}
+
+
+type Location {
+  address  String?
+  type Point @default(Point)
+  coordinates Int[]
+}
+
+enum Point {
+  Point
 }

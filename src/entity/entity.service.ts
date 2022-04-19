@@ -3,13 +3,22 @@ import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
+import { CreateEntityDto } from './dto/create-entity.dto';
 
 @Injectable()
 export class EntityService {
-  constructor(private prismaService: PrismaService, @Inject(forwardRef(() => UsersService)) private userService: UsersService){}
+  constructor(private prismaService: PrismaService, @Inject(forwardRef(() => UsersService)) private userService: UsersService) { }
 
-  async create(createEntityDto: Prisma.EntityCreateInput) {
+  async create(createEntityDto: CreateEntityDto) {
     try {
+      let data: any = createEntityDto;
+      if (createEntityDto.location) {
+        if (createEntityDto.location.longitude != undefined && createEntityDto.location.longitude != undefined) {
+          data.location.coordinates = [createEntityDto.location.longitude, createEntityDto.location.latitude]
+          delete (data.location.longitude);
+          delete (createEntityDto.location.latitude)
+        }
+      }
       let createdEntity = await this.prismaService.entity.create({ data: createEntityDto });
       return createdEntity;
     } catch (error) {
@@ -32,7 +41,7 @@ export class EntityService {
   async findOne(id: string) {
     try {
       let entity = await this.prismaService.entity.findUnique({ where: { id: id } });
-      if(!entity) {
+      if (!entity) {
         throw new NotFoundException(`Etity with id ${id} not found`);
       }
       return entity;
@@ -51,7 +60,7 @@ export class EntityService {
   async update(id: string, updateEntityDto: Prisma.EntityUpdateInput) {
     await this.findOne(id);
     try {
-      let updatedEntity = await this.prismaService.entity.update({where: {id: id}, data: updateEntityDto});
+      let updatedEntity = await this.prismaService.entity.update({ where: { id: id }, data: updateEntityDto });
       return updatedEntity;
     } catch (error) {
       // Handle contrainst error
@@ -68,7 +77,7 @@ export class EntityService {
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.prismaService.entity.delete({where: {id: id}});
+    return this.prismaService.entity.delete({ where: { id: id } });
   }
 
   // Link user to an entity
@@ -78,11 +87,13 @@ export class EntityService {
     // verify if the user exist
     await this.userService.findOne(userid);
     // Link if both the entity and the user exist
-    return this.prismaService.entity.update({where: {id: entityId}, data:{
-      users: {
-        connect: {id: userid}
+    return this.prismaService.entity.update({
+      where: { id: entityId }, data: {
+        users: {
+          connect: { id: userid }
+        }
       }
-    }});
+    });
   }
 
   // Unlink user to an entity
@@ -92,10 +103,35 @@ export class EntityService {
     // verify if the user exist
     await this.userService.findOne(userid);
     // Link if both the entity and the user exist
-    return this.prismaService.entity.update({where: {id: entityId}, data:{
-      users: {
-        disconnect: {id: userid}
+    return this.prismaService.entity.update({
+      where: { id: entityId }, data: {
+        users: {
+          disconnect: { id: userid }
+        }
       }
-    }});
+    });
+  }
+
+ 
+  async search(longitude: number, latitude: number, distance: number = 10000) {
+    try {
+      const entities = await this.prismaService.entity.findRaw({
+        filter: {
+          location: {
+            $nearSphere: {
+              $geometry: {
+                type: "Point",
+                coordinates: [longitude, latitude]
+              },
+              // $minDistance: 10000,
+              $maxDistance: distance
+            }
+          }
+        }
+      });
+      return entities;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
