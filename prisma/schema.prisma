@@ -25,6 +25,7 @@ model User {
   roles     Role[]    @relation(fields: [roleIDs], references: [id])
   entityIDs String[]  @db.ObjectId
   entities  Entity[]  @relation(fields: [entityIDs], references: [id])
+  bookings   Booking[]
 }
 
 model Role {
@@ -44,23 +45,64 @@ model Permission {
 }
 
 model Entity {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  siret   String   @unique
-  phone   String?
-  email   String?
-  userIDs String[] @db.ObjectId
-  users   User[]   @relation(fields: [userIDs], references: [id])
-  location Location?
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  siret      String    @unique
+  phone      String?
+  email      String?
+  userIDs    String[]  @db.ObjectId
+  users      User[]    @relation(fields: [userIDs], references: [id])
+  location   Location?
+  openDayIDs String[]  @db.ObjectId
+  openDays   OpenDay[] @relation(fields: [openDayIDs], references: [id])
 }
 
-
 type Location {
-  address  String?
-  type Point @default(Point)
+  address     String?
+  type        Point   @default(Point)
   coordinates Int[]
 }
 
 enum Point {
   Point
+}
+
+model OpenDay {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  day       Day
+  startHour DateTime  @default(now())
+  endHour   DateTime
+  entityIDs String[]  @db.ObjectId
+  entities  Entity[]  @relation(fields: [entityIDs], references: [id])
+  creneaus  Creneau[]
+
+  @@unique([day, entityIDs])
+}
+
+enum Day {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+model Creneau {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  startHour DateTime
+  endHour   DateTime
+  openDayId String    @db.ObjectId
+  openDay   OpenDay   @relation(fields: [openDayId], references: [id])
+  bookings  Booking[]
+}
+
+model Booking {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime @default(now())
+  creneauId String   @db.ObjectId
+  userId    String   @db.ObjectId
+  creneau   Creneau  @relation(fields: [creneauId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
