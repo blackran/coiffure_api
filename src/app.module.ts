@@ -9,11 +9,14 @@ import { ConfigModule } from '@nestjs/config';
 import { PermissionsModule } from './permissions/permissions.module';
 import { EntityModule } from './entity/entity.module';
 import { AddressModule } from './address/address.module';
+import { OpenDayModule } from './open-day/open-day.module';
+import { CreneauModule } from './creneau/creneau.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-  }), AuthModule, RolesModule, UsersModule, PrismaModule, PermissionsModule, EntityModule, AddressModule],
+  }), AuthModule, RolesModule, UsersModule, PrismaModule, PermissionsModule, EntityModule, AddressModule, OpenDayModule, CreneauModule, BookingModule],
   controllers: [AppController],
   providers: [AppService],
 })
