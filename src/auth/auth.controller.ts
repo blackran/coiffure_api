@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { ProfessionalRegisterDto } from './dto/professionalRegister.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtGuard } from './guards/jwt.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -22,6 +23,22 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     let user = await this.authService.register(registerDto);
     delete(user.password);
+    let tooken = await this.authService.login(user);
+    let response = {...user, ...tooken}
+    return response;
+  }
+
+  /**
+   * Create an user with an entity for professional use
+   * @param registerDto ProfessionalRegisterDto
+   * @returns HttpResponse
+   */
+  @Post('/register/professional')
+  async professionalRegister(@Body() registerDto: ProfessionalRegisterDto) {
+    let user = await this.authService.professionalRegister(registerDto);
+    delete(user.password);
+    let tooken = await this.authService.login(user);
+    let response = {...user, ...tooken}
     return user;
   }
 

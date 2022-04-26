@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClient
 import { RolesService } from 'src/roles/roles.service';
 import { EntityService } from 'src/entity/entity.service';
 import { CreateEntityDto } from 'src/entity/dto/create-entity.dto';
+import { CreateUserWithEntityDto } from './dto/create-user-with-entity.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,44 @@ export class UsersService {
       }
       // Handle validation error 
       if(error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Invalid date')
+      }
+      throw error;
+    }
+  }
+
+  async createWithEntity(createUserDto: CreateUserWithEntityDto) {
+    try {
+      let data: any = createUserDto;
+      let hasedPassword = await bcrypt.hash(data.password, await bcrypt.genSalt(10))
+      data.password = hasedPassword;
+      // let createdUser = await this.prismaService.user.create({ data: createUserDto });
+      // Transform data.entities.location to match the prisma model
+      if (createUserDto.entities.location) {
+        if (createUserDto.entities.location.longitude != undefined && createUserDto.entities.location.longitude != undefined) {
+          data.entities.location.coordinates = [createUserDto.entities.location.longitude, createUserDto.entities.location.longitude]
+          delete (data.entities.location.longitude);
+          delete (data.entities.location.latitude);
+        }
+      }
+      // Transform data entities to match the prisma model.
+      data.entities = { create: { ...data.entities}};
+      let createdUser = await this.prismaService.user.create({data: data});
+      return createdUser;
+    } catch (error) {
+      // Handle contrainst error
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          if (error.meta['target'] = 'Entity_siret_key') {
+            throw new ConflictException("Siret already exist");
+          }
+          throw new ConflictException("Email already exist");
+        } else {
+          throw error;
+        }
+      }
+      // Handle validation error 
+      if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Invalid date')
       }
       throw error;
@@ -144,10 +183,19 @@ export class UsersService {
 
   async createEntity(userId: string, createEntityDto: CreateEntityDto) {
    try {
+     let data: any = createEntityDto;
+     // add coordinates to data
+     if (createEntityDto.location) {
+       if (createEntityDto.location.longitude != undefined && createEntityDto.location.longitude != undefined) {
+         data.location.coordinates = [createEntityDto.location.longitude, createEntityDto.location.latitude]
+         delete (data.location.longitude);
+         delete (createEntityDto.location.latitude)
+       }
+     }
      let updatedUser = await this.prismaService.user.update({
        where: { id: userId }, data: {
          entities: {
-           create: createEntityDto
+           create: data
          }
        }
      });

@@ -16,7 +16,7 @@ export class EntityService {
         if (createEntityDto.location.longitude != undefined && createEntityDto.location.longitude != undefined) {
           data.location.coordinates = [createEntityDto.location.longitude, createEntityDto.location.latitude]
           delete (data.location.longitude);
-          delete (createEntityDto.location.latitude)
+          delete (data.location.latitude);
         }
       }
       let createdEntity = await this.prismaService.entity.create({ data: createEntityDto });

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEmail, IsLatitude, IsLongitude, IsNotEmpty, IsNumber, IsOptional, Max, Min } from "class-validator";
+import { Type } from "class-transformer";
+import { IsEmail, IsLatitude, IsLongitude, IsNotEmpty, IsNumber, IsOptional, Max, Min, ValidateNested } from "class-validator";
 
 class Localisation {
   @ApiPropertyOptional()
@@ -7,13 +8,11 @@ class Localisation {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   @IsLongitude()
   longitude: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   @IsLatitude()
   latitude: number;
 }
@@ -36,5 +35,7 @@ export class CreateEntityDto {
   
   @ApiProperty()
   @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => Localisation)
   location: Localisation;
 }

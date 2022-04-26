@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { ProfessionalRegisterDto } from './dto/professionalRegister.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,5 +33,9 @@ export class AuthService {
 
   register(registerDto: RegisterDto) {
     return this.userService.create(<Prisma.UserCreateInput>registerDto);
+  }
+
+  professionalRegister(registerDto: ProfessionalRegisterDto) {
+    return this.userService.createWithEntity(<any>registerDto);
   }
 }
