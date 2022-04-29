@@ -54,6 +54,7 @@ export class UsersService {
       let createdUser = await this.prismaService.user.create({data: data});
       return createdUser;
     } catch (error) {
+      console.log(error);
       // Handle contrainst error
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {

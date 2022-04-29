@@ -60,7 +60,7 @@ model Entity {
 type Location {
   address     String?
   type        Point   @default(Point)
-  coordinates Int[]
+  coordinates Float[]
 }
 
 enum Point {
