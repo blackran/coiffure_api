@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreneauService } from './creneau.service';
 import { CreateCreneauDto } from './dto/create-creneau.dto';
 import { UpdateCreneauDto } from './dto/update-creneau.dto';
+import { Prisma } from '@prisma/client';
 
 @Controller('creneau')
 @ApiTags('Creneau')
@@ -11,7 +12,7 @@ export class CreneauController {
 
   @Post()
   create(@Body() createCreneauDto: CreateCreneauDto) {
-    return this.creneauService.create(createCreneauDto);
+    return this.creneauService.create(<Prisma.CreneauCreateManyInput>createCreneauDto);
   }
 
   @Get()
@@ -21,16 +22,16 @@ export class CreneauController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.creneauService.findOne(+id);
+    return this.creneauService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCreneauDto: UpdateCreneauDto) {
-    return this.creneauService.update(+id, updateCreneauDto);
+    return this.creneauService.update(id, <Prisma.CreneauUpdateInput>updateCreneauDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.creneauService.remove(+id);
+    return this.creneauService.remove(id);
   }
 }

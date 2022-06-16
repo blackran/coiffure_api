@@ -3,6 +3,7 @@ import { OpenDayService } from './open-day.service';
 import { CreateOpenDayDto } from './dto/create-open-day.dto';
 import { UpdateOpenDayDto } from './dto/update-open-day.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { Prisma } from '@prisma/client';
 
 @Controller('open-day')
 @ApiTags('Open day')
@@ -11,7 +12,7 @@ export class OpenDayController {
 
   @Post()
   create(@Body() createOpenDayDto: CreateOpenDayDto) {
-    return this.openDayService.create(createOpenDayDto);
+    return this.openDayService.create(<Prisma.OpenDayCreateManyInput>createOpenDayDto);
   }
 
   @Get()
@@ -21,16 +22,16 @@ export class OpenDayController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.openDayService.findOne(+id);
+    return this.openDayService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOpenDayDto: UpdateOpenDayDto) {
-    return this.openDayService.update(+id, updateOpenDayDto);
+    return this.openDayService.update(id,  <Prisma.OpenDayUpdateInput>updateOpenDayDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.openDayService.remove(+id);
+    return this.openDayService.remove(id);
   }
 }

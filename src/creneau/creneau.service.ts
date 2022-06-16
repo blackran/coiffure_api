@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCreneauDto } from './dto/create-creneau.dto';
 import { UpdateCreneauDto } from './dto/update-creneau.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CreneauService {
-  create(createCreneauDto: CreateCreneauDto) {
-    return 'This action adds a new creneau';
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(creneau: Prisma.CreneauCreateManyInput) {
+    return this.prisma.creneau.create({
+      data: creneau,
+    });
   }
 
   findAll() {
-    return `This action returns all creneau`;
+    return this.prisma.creneau.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} creneau`;
+  findOne(id: string) {
+    return this.prisma.creneau.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateCreneauDto: UpdateCreneauDto) {
-    return `This action updates a #${id} creneau`;
+  update(id: string, creneau: Prisma.CreneauUpdateInput) {
+    return this.prisma.creneau.update({
+      where: {
+        id,
+      },
+      data: creneau,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} creneau`;
+  remove(id: string) {
+    return this.prisma.creneau.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

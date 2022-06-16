@@ -1,8 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDateString, IsEnum, IsMongoId, IsNotEmpty } from "class-validator";
-import { isDate } from "util/types";
 
-enum Days {
+enum Day {
   SUNDAY,
   MONDAY,
   TUESDAY,
@@ -14,10 +13,10 @@ enum Days {
 
 export class CreateOpenDayDto {
   
-  @ApiProperty({enum: Days})
+  @ApiProperty({enum: Day})
   @IsNotEmpty()
-  @IsEnum(Days)
-  day: Days;
+  @IsEnum(Day)
+  day: String;
 
   @ApiPropertyOptional()
   @IsDateString()
