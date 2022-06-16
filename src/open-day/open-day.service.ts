@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOpenDayDto } from './dto/create-open-day.dto';
 import { UpdateOpenDayDto } from './dto/update-open-day.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class OpenDayService {
-  create(createOpenDayDto: CreateOpenDayDto) {
-    return 'This action adds a new openDay';
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(openDay: Prisma.OpenDayCreateManyInput) {
+    return this.prisma.openDay.create({
+      data: openDay,
+    });
   }
 
   findAll() {
-    return `This action returns all openDay`;
+    return this.prisma.openDay.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} openDay`;
+  findOne(id: string) {
+    return this.prisma.openDay.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateOpenDayDto: UpdateOpenDayDto) {
-    return `This action updates a #${id} openDay`;
+  update(id: string, openDay: Prisma.OpenDayUpdateInput) {
+    return this.prisma.openDay.update({
+      where: {
+        id,
+      },
+      data: openDay,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} openDay`;
+  remove(id: string) {
+    return this.prisma.openDay.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
