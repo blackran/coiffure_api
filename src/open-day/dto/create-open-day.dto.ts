@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDateString, IsEnum, IsMongoId, IsNotEmpty } from "class-validator";
-import { isDate } from "util/types";
 
 enum Day {
   SUNDAY,
