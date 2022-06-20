@@ -4,6 +4,6 @@ import { CreneauController } from './creneau.controller';
 
 @Module({
   controllers: [CreneauController],
-  providers: [CreneauService]
+  providers: [CreneauService],
 })
 export class CreneauModule {}

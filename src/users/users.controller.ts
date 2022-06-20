@@ -1,5 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, BadRequestException } from '@nestjs/common';
-import { UsersService } from './users.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  BadRequestException,
+} from '@nestjs/common'; import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -12,12 +22,12 @@ import { CreateEntityDto } from 'src/entity/dto/create-entity.dto';
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     let createdUser = await this.usersService.create(<Prisma.UserCreateInput>createUserDto)
-    delete(createdUser.password);
+    delete (createdUser.password);
     return createdUser;
   }
 
@@ -27,18 +37,18 @@ export class UsersController {
     let args = this.parsePrismaArgs(prismaArgs);
     let users = await this.usersService.findAll(args);
     // Remove passowrd from the users
-    users.map((user)=> {
-      delete(user.password);
-    })
+    users.map((user) => {
+      delete (user.password);
+    });
     return users;
   }
 
   @Get(':id')
-  @ApiQuery({name: 'args', required: false})
+  @ApiQuery({ name: 'args', required: false })
   async findOne(@Param('id') id: string, @Query('args') prismaArgs: string) {
     let args = this.parsePrismaArgs(prismaArgs);
     let user = await this.usersService.findOne(id, args);
-    delete(user.password);
+    delete (user.password);
     return user;
   }
 
@@ -64,30 +74,49 @@ export class UsersController {
     return this.usersService.removeRole(id, roleId);
   }
 
-  @Post(":userId/entity/:entityId")
-  async addEntity(@Param("userId") userId: string, @Param('entityId') entityId: string) {
-    let updatedUser: any = await this.usersService.addEntity(userId, entityId);
-    // remove the hased password from the database result
-    delete(updatedUser.password);
-    return updatedUser;
-  }
-  @Delete(":userId/entity/:entityId")
-  async removeEntity(@Param("userId") userId: string, @Param('entityId') entityId: string) {
-    let updatedUser: any = await this.usersService.removeEntity(userId, entityId);
+  @Post(':userId/entity/:entityId')
+  async addEntity(
+    @Param('userId') userId: string,
+    @Param('entityId') entityId: string,
+  ) {
+    const updatedUser: any = await this.usersService.addEntity(
+      userId,
+      entityId,
+    );
     // remove the hased password from the database result
     delete (updatedUser.password);
     return updatedUser;
   }
 
-  @Post(":userId/entity")
-  async createEntity(@Param("userId") userId: string, @Body() createEntityDto: CreateEntityDto) {
-    let updateUser = await this.usersService.createEntity(userId, createEntityDto);
+  @Delete(':userId/entity/:entityId')
+  async removeEntity(
+    @Param('userId') userId: string,
+    @Param('entityId') entityId: string,
+  ) {
+    const updatedUser: any = await this.usersService.removeEntity(
+      userId,
+      entityId,
+    );
+    // remove the hased password from the database result
+    delete (updatedUser.password);
+    return updatedUser;
+  }
+
+  @Post(':userId/entity')
+  async createEntity(
+    @Param('userId') userId: string,
+    @Body() createEntityDto: CreateEntityDto,
+  ) {
+    const updateUser = await this.usersService.createEntity(
+      userId,
+      createEntityDto,
+    );
     return updateUser;
   }
 
   /**
    * Parse prisma string argument to a JSON format
-   * @param prismaArgs 
+   * @param prismaArgs
    * @returns JSON // the argument in a JSON object
    */
   private parsePrismaArgs(prismaArgs) {
@@ -98,7 +127,9 @@ export class UsersController {
       }
       return args;
     } catch (error) {
-      throw new BadRequestException(`params args must be a strigify JSON format`);
+      throw new BadRequestException(
+        `params args must be a strigify JSON format`,
+      );
     }
   }
 }
