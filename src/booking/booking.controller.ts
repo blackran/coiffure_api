@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { Prisma } from '@prisma/client';
 
 @Controller('booking')
 @ApiTags('Booking')
@@ -11,7 +12,7 @@ export class BookingController {
 
   @Post()
   create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingService.create(createBookingDto);
+    return this.bookingService.create(<Prisma.BookingCreateManyInput>createBookingDto);
   }
 
   @Get()
@@ -21,16 +22,16 @@ export class BookingController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.bookingService.findOne(+id);
+    return this.bookingService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingService.update(+id, updateBookingDto);
+    return this.bookingService.update(id, <Prisma.BookingUpdateInput>updateBookingDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.bookingService.remove(+id);
+    return this.bookingService.remove(id);
   }
 }
