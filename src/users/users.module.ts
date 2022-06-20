@@ -9,6 +9,6 @@ import { EntityModule } from 'src/entity/entity.module';
   imports: [RolesModule, forwardRef(() => EntityModule)],
   controllers: [UsersController],
   providers: [UsersService, CreateUserDto],
-  exports: [UsersService, CreateUserDto]
+  exports: [UsersService, CreateUserDto],
 })
 export class UsersModule {}

@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { CreateEntityDto } from 'src/entity/dto/create-entity.dto';
-import { CreateUserDto } from './create-user.dto';
+import { CreateServiceDto } from './create-service.dto';
 
-export class CreateUserWithEntityDto extends CreateUserDto {
+export class CreateSericeWithEntityDto extends CreateServiceDto {
   @ApiProperty()
   @IsNotEmpty()
   @ValidateNested()

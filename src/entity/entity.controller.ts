@@ -1,16 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  Req,
+  Request,
+} from '@nestjs/common';
 import { EntityService } from './entity.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UsersService } from 'src/users/users.service';
 import { CreateEntityDto } from './dto/create-entity.dto';
 import { UpdateEntityDto } from './dto/update-entity.dto';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { SearchQueryDto } from './dto/search-query.dto';
+// import { Request } from 'express';
 
 @Controller('entity')
 @ApiTags('Etities')
 export class EntityController {
-  constructor(private readonly entityService: EntityService) { }
+  constructor(
+    private readonly entityService: EntityService,
+    private readonly userService: UsersService,
+  ) { }
 
   @Post()
   @ApiBearerAuth()
@@ -20,18 +37,21 @@ export class EntityController {
   }
 
   @Get()
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
-  findAll() {
-    return this.entityService.findAll();
+  // @ApiBearerAuth()
+  // @UseGuards(JwtGuard)
+  findAll(@Req() context: Request) {
+    return this.entityService.findAll(context);
   }
 
   @Get('search')
-  @ApiQuery({ name: 'longitude', required: true, type: "number"})
-  @ApiQuery({ name: 'latitude', required: true, type: "number"})
-  @ApiQuery({ name: 'distance', required: true, type: "number"})
+  @ApiQuery({ name: 'longitude', required: true, type: 'number' })
+  @ApiQuery({ name: 'latitude', required: true, type: 'number' }) @ApiQuery({ name: 'distance', required: true, type: 'number' })
   search(@Query() query: SearchQueryDto) {
-    return this.entityService.search(+query.longitude, +query.latitude, +query.distance);
+    return this.entityService.search(
+      +query.longitude,
+      +query.latitude,
+      +query.distance,
+    );
   }
 
   @Get(':id')
@@ -55,17 +75,41 @@ export class EntityController {
     return this.entityService.remove(id);
   }
 
-  @Post(':entityId/users/:userId')
+  @Post('users/:userId')
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
-  addUser(@Param('entityId') entityId: string, @Param('userId') userId: string) {
-    return this.entityService.addUser(entityId, userId);
+  async addUser(@Param('userId') userId: string, @Request() req) {
+    const user: CreateUserDto = await this.userService.findOne(req.user.id);
+    const entity = await this.entityService.findOne(user.entityIDs);
+    return this.entityService.addUser(entity.id, userId);
   }
 
-  @Delete(':entityId/users/:userId')
+  @Delete('users/:userId')
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
-  removeUser(@Param('entityId') entityId: string, @Param('userId') userId: string) {
-    return this.entityService.removeUser(entityId, userId);
+  async removeUser(@Param('userId') userId: string, @Request() req) {
+    const user: CreateUserDto = await this.userService.findOne(req.user.id);
+    const entity = await this.entityService.findOne(user.entityIDs);
+    return this.entityService.removeUser(entity.id, userId);
+  }
+
+  @Post(':entityId/serivce/:serviceId')
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  async addService(
+    @Param('entityId') entityId: string,
+    @Param('serviceId') serviceId: string,
+  ) {
+    return this.entityService.addService(entityId, serviceId);
+  }
+
+  @Delete(':entityId/serivce/:serviceId')
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  removeService(
+    @Param('entityId') entityId: string,
+    @Param('serviceId') serviceId: string,
+  ) {
+    return this.entityService.removeService(entityId, serviceId);
   }
 }

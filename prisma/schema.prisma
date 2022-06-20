@@ -3,12 +3,34 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["mongoDb"]
+  previewFeatures = ["mongoDb"] 
 }
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+
+model Entity {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  siret      String    @unique
+  phone      String?
+  email      String?
+  location   Location?
+  openDayIDs String[]  @db.ObjectId
+  openDays   OpenDay[] @relation(fields: [openDayIDs], references: [id])
+  image  String?
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  serviceIDs String[]  @db.ObjectId
+  service    Service[] @relation(fields: [serviceIDs], references: [id])
+
+  userIDs    String[]  @db.ObjectId
+  users      User[]    @relation(fields: [userIDs], references: [id])
 }
 
 model User {
@@ -23,9 +45,14 @@ model User {
   isActif   Boolean?  @default(true)
   roleIDs   String[]  @db.ObjectId
   roles     Role[]    @relation(fields: [roleIDs], references: [id])
+
   entityIDs String[]  @db.ObjectId
   entities  Entity[]  @relation(fields: [entityIDs], references: [id])
+
   bookings   Booking[]
+  image  String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
 
 model Role {
@@ -44,17 +71,13 @@ model Permission {
   roles   Role[]   @relation(fields: [roleIDs], references: [id])
 }
 
-model Entity {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  siret      String    @unique
-  phone      String?
-  email      String?
-  userIDs    String[]  @db.ObjectId
-  users      User[]    @relation(fields: [userIDs], references: [id])
-  location   Location?
-  openDayIDs String[]  @db.ObjectId
-  openDays   OpenDay[] @relation(fields: [openDayIDs], references: [id])
+model Service {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String?
+
+  entityIDs String[]  @db.ObjectId
+  entity    Entity[] @relation(fields: [entityIDs], references: [id])
 }
 
 type Location {
@@ -101,6 +124,7 @@ model Creneau {
 model Booking {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   date      DateTime @default(now())
+  updatedAt DateTime @updatedAt
   creneauId String   @db.ObjectId
   userId    String   @db.ObjectId
   creneau   Creneau  @relation(fields: [creneauId], references: [id])
