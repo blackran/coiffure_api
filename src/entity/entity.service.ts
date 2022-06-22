@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   // forwardRef,
   // Inject,
   Injectable,
@@ -13,12 +15,11 @@ import { UsersService } from 'src/users/users.service';
 import { ServiceService } from 'src/service/service.service';
 import { CreateEntityDto } from './dto/create-entity.dto';
 
-// @Injectable()
+@Injectable()
 export class EntityService {
   constructor(
-    private prismaService: PrismaService,
-    private userService: UsersService,
-    private serviceService: ServiceService,
+    private prismaService: PrismaService, private serviceService: ServiceService,
+    @Inject(forwardRef(() => UsersService)) private userService: UsersService
   ) {}
 
   async create(createEntityDto: CreateEntityDto) {

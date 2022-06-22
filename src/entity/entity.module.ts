@@ -10,7 +10,7 @@ import { ServiceModule } from 'src/service/service.module';
 @Module({
   imports: [
     forwardRef(() => UsersModule),
-    forwardRef(() => ServiceModule),
+    ServiceModule,
     OpenDayModule,
   ],
   controllers: [EntityController, EntityOpenDayController],
