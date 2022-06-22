@@ -19,7 +19,11 @@ export class ServiceService {
 
   async findAll() {
     try {
-      const services = await this.prismaService.service.findMany();
+      const services = await this.prismaService.service.findMany({
+        include: {
+          entity: true,
+        },
+      });
       return services;
     } catch (error) {
       throw error;

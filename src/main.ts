@@ -5,6 +5,8 @@ import { AppModule } from './app.module';
 
 function bootstrap() {
   const port = process.env.PORT || 3000;
+  const address = process.env.ADDRESS || 'localhost';
+
   NestFactory.create(AppModule)
     .then((app) => {
       // Enable CORS
@@ -20,9 +22,11 @@ function bootstrap() {
       const document = SwaggerModule.createDocument(app, config);
       SwaggerModule.setup('api', app, document);
       app
-        .listen(port)
+        .listen(port, address)
         .then(() => {
-          console.info(`Àpplication listening on http://localhost:${port}/api`);
+          console.info(
+            `Àpplication listening on http://${address}:${port}/api`,
+          );
         })
         .catch((err) => console.log(err));
     })

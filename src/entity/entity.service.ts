@@ -57,7 +57,8 @@ export class EntityService {
 
   findAll(context: any) {
     const queryObj = { ...context.query };
-    const excludeField = ['page', 'sort', 'limit', 'fields'];
+    const search = context.query.search;
+    const excludeField = ['search', 'page', 'sort', 'limit', 'fields'];
     excludeField.map((el) => delete queryObj[el]);
     // let queryStr = JSON.stringify(queryObj);
     // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
@@ -66,8 +67,6 @@ export class EntityService {
     const page = context.query.page * 1 || 1;
     const limit = context.query.limit * 1 || 10;
     const skip = (page - 1) * limit;
-
-    const search = context.query.search;
 
     const orderBy = [];
     if (context.query.sort) {
