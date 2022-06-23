@@ -1,43 +1,50 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsBoolean, IsDateString, IsEmail, IsNotEmpty, IsOptional, MinLength, ValidateNested } from "class-validator";
-import { CreateEntityDto } from "src/entity/dto/create-entity.dto";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  IsDateString,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+import { CreateEntityDto } from 'src/entity/dto/create-entity.dto';
 
 export class ProfessionalRegisterDto {
   @ApiProperty()
   @IsNotEmpty()
-  lastName: String
+  lastName: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  firstName?: String
+  firstName?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
-  email: String
+  email: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  phone?: String
+  phone?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(6)
-  password: String
+  password: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  address?: String
+  address?: string;
 
   @ApiPropertyOptional()
   @IsDateString()
   @IsOptional()
-  birthDate?: Date
+  birthDate?: Date;
 
   @ApiProperty()
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => CreateEntityDto)
-  entities : CreateEntityDto
+  entities: CreateEntityDto;
 }

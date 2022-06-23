@@ -45,7 +45,8 @@ export class EntityController {
 
   @Get('search')
   @ApiQuery({ name: 'longitude', required: true, type: 'number' })
-  @ApiQuery({ name: 'latitude', required: true, type: 'number' }) @ApiQuery({ name: 'distance', required: true, type: 'number' })
+  @ApiQuery({ name: 'latitude', required: true, type: 'number' })
+  @ApiQuery({ name: 'distance', required: true, type: 'number' })
   search(@Query() query: SearchQueryDto) {
     return this.entityService.search(
       +query.longitude,

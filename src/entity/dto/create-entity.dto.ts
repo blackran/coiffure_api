@@ -8,6 +8,7 @@ import {
   ValidateNested,
   IsEmail,
 } from 'class-validator';
+import { CreateServiceDto } from 'src/service/dto/create-service.dto';
 
 class Localisation {
   @ApiPropertyOptional()
@@ -66,4 +67,10 @@ export class CreateEntityDto {
   @ValidateNested()
   @Type(() => Localisation)
   location: Localisation;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => CreateServiceDto)
+  service: any;
 }

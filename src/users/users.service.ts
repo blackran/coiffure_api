@@ -59,8 +59,14 @@ export class UsersService {
         }
       }
       // Transform data entities to match the prisma model.
+      data.entities.service = {
+        connect: data.entities.service.map((dt: any) => ({ id: dt.id })),
+      };
+
       data.entities = { create: { ...data.entities } };
-      const createdUser = await this.prismaService.user.create({ data: data });
+
+      console.log({ data });
+      const createdUser = await this.prismaService.user.create({ data });
       return createdUser;
     } catch (error) {
       console.log(error);
@@ -76,7 +82,7 @@ export class UsersService {
         }
       }
       if (error instanceof Prisma.PrismaClientValidationError) {
-        throw new BadRequestException('Invalid date');
+        throw new BadRequestException('Error of server');
       }
       throw error;
     }
