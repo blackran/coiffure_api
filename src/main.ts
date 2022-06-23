@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 
 function bootstrap() {
   const port = process.env.PORT || 3000;
-  const address = process.env.ADDRESS || 'localhost';
+  const address = process.env.ADDRESS;
 
   NestFactory.create(AppModule)
     .then((app) => {
@@ -21,8 +21,13 @@ function bootstrap() {
         .build();
       const document = SwaggerModule.createDocument(app, config);
       SwaggerModule.setup('api', app, document);
-      app
-        .listen(port, address)
+      let appAsinc;
+      if (address) {
+        appAsinc = app.listen(port, address);
+      } else {
+        appAsinc = app.listen(port);
+      }
+      appAsinc
         .then(() => {
           console.info(
             `Àpplication listening on http://${address}:${port}/api`,
