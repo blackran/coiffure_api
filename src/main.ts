@@ -30,7 +30,7 @@ function bootstrap() {
       appAsinc
         .then(() => {
           console.info(
-            `Àpplication listening on http://${address}:${port}/api`,
+            `Àpplication listening on http://${address || 'localhost'}:${port}/api`,
           );
         })
         .catch((err) => console.log(err));
