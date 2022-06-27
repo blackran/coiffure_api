@@ -17,7 +17,7 @@ function bootstrap() {
         .setTitle('Coiffure api')
         .setDescription('This api was developped by wedevin')
         .setVersion('1.0')
-        .addBearerAuth({ type: 'http', scheme: 'bearer' })
+        .addBearerAuth({ scheme: 'bearer' })
         .build();
       const document = SwaggerModule.createDocument(app, config);
       SwaggerModule.setup('api', app, document);
