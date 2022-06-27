@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 function bootstrap() {
-  const port = process.env.PORT || 3000;
+  const port: number = parseInt(`${process.env.PORT}`) || 3000;
   const address = process.env.ADDRESS;
 
   NestFactory.create(AppModule)
